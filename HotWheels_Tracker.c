@@ -26,7 +26,7 @@
 int main(void)
 {
     // holds name of file that stores collection
-    char collectionStorage = "collection.txt";
+    char collectionStorageName[15] = "collection.txt";
 
     // pointer to dynamically allocated array
     hotWheel **myCars = NULL;
@@ -60,10 +60,10 @@ int main(void)
     int k;
 
     char trash[10];
-    collectionStorage = fopen(myCollection, "r");
+    collectionStorage = fopen(collectionStorageName, "r");
     if (collectionStorage == NULL) // this handles if no previous file was found
     {
-        while (commandNum != 0)
+        do
         {
             commandNum = chooseCommand();
             switch (commandNum)
@@ -80,28 +80,70 @@ int main(void)
                         scanf("%d", &doSave);
                         if (doSave == 1)
                         {
-                            printf("Saving...");
-                            // COME HERE AND ADD FUNCTION FOR Saving
-                            printf("Done. Collection saved.\n")
+                            if (*arrSize == 0)
+                            {
+                                printf("No collection to save: size of collection = 0\n");
+                                // start closing program here without saving
+                                printf("Exiting...\n");
+                                printf("Closing file...");
+                                fclose(collectionStorage);
+                                printf("Done.\n");
+
+                                printf("Erasing...");
+                                myCars = destroyHotWheelArr(myCars, arrSize);
+                                printf("Done. Collection erased.\n");
+                                printf("Done Exiting.\n");
+                                return 0;
+                            } else
+                            {
+                                printf("Saving...");
+                                // COME HERE AND ADD FUNCTION FOR Saving
+                                deleteCollectFile(collectionStorageName);
+                                fclose(collectionStorage);
+                                collectionStorage = createCollectFile(collectionStorageName, myCars, arrSize);
+                                fclose(collectionStorage);
+                                printf("Done. Collection saved.\n");
+                                }
+                                printf("Saving...");
+                                // COME HERE AND ADD FUNCTION FOR Saving
+                                deleteCollectFile(collectionStorageName);
+                                fclose(collectionStorage);
+                                collectionStorage = createCollectFile(collectionStorageName, myCars, arrSize);
+                                fclose(collectionStorage);
+                                printf("Done. Collection saved.\n");
+                                printf("Exiting...\n");
+                                printf("Erasing collection list...");
+                                myCars = destroyHotWheelArr(myCars, arrSize);
+                                printf("Done. Collection list erased.\n");
+                                printf("Done Exiting.\n");
+                                return 0;
                         } else
                         {
                             // start closing program here without saving
-                            printf("Exiting...");
+                            printf("Exiting...\n");
+                            printf("Closing file...");
                             fclose(collectionStorage);
-                            myCars = destroyHotWheelArr(myCars, arrSize);
                             printf("Done.\n");
+
+                            printf("Erasing...");
+                            myCars = destroyHotWheelArr(myCars, arrSize);
+                            printf("Done. Collection erased.\n");
+                            printf("Done Exiting.\n");
                             return 0;
                         }
-                        printf("Erasing...")
-                        printf("Done. Collection erased.\n");
                     } else
                     {
-                        printf("Canceled.\n")
+                        printf("Canceled.\n");
                     }
-
                     break;
                 case 1: // prints entire collection
+                    printf("\n");
+                    printf("You selected function 1: Print my collection\n");
                     printHotWheelArr(myCars, arrSize);
+                    printf("\nDone printing.\n");
+                    printf("-----------------------------------------------------\n");
+                    printf("\n");
+                    printf("\n");
                     break;
                 case 2: // Adds ONE Hot wheel
                     addAHotWheel(myCars, arrSize);
@@ -118,19 +160,19 @@ int main(void)
                     scanf("%d", &doubleCheck);
                     if (doubleCheck == 1)
                     {
-                        printf("Erasing...")
+                        printf("Erasing...");
                         myCars = destroyHotWheelArr(myCars, arrSize);
                         printf("Done. Collection erased.\n");
                     } else
                     {
-                        printf("Canceled.\n")
+                        printf("Canceled.\n");
                     }
                     break;
                 case 6: // Save entire collection
                     // COME BACK HERE AND ADD THIS FUNCTIONALITY
-
+                    break;
             }
-        }
+        } while (commandNum != 0);
     } else // handle if previous file was found
     {
         // this will assume file is never empty because if previous program
@@ -141,9 +183,9 @@ int main(void)
         // reads number of cars from file
         // THIS MIGHT GET RID OF TRAILING NEWLINE CHAR. MAKE SURE TO COME BACK
         // AND CHECK THIS IS TRUE
-        fscanf(collectionStorage, "%d %c", &arrSize, trash);
+        fscanf(collectionStorage, "%d %c", arrSize, trash);
 
-        myCars = createHwArrFile(collectionStorage, arrSize);
+        myCars = createHwArrFromFile(collectionStorage, arrSize);
 
 
         // I JUST COPY AND PASTED THIS FROM THE IF SECTION ABOVE. MAKE SURE TO MAKE NECCESSARY CHANGES TO FUNCTIONS
@@ -167,7 +209,7 @@ int main(void)
                         {
                             printf("Saving...");
                             // COME HERE AND ADD FUNCTION FOR Saving
-                            printf("Done. Collection saved.\n")
+                            printf("Done. Collection saved.\n");
                         } else
                         {
                             // start closing program here without saving
@@ -179,7 +221,7 @@ int main(void)
                         }
                     } else
                     {
-                        printf("Canceled.\n")
+                        printf("Canceled.\n");
                     }
 
                     break;
@@ -203,15 +245,17 @@ int main(void)
                     scanf("%d", &doubleCheck);
                     if (doubleCheck == 1)
                     {
-                        printf("Erasing...")
+                        printf("Erasing...");
                         myCars = destroyHotWheelArr(myCars, arrSize);
                         printf("Done. Collection erased.\n");
                     } else
                     {
-                        printf("Canceled.\n")
+                        printf("Canceled.\n");
                     }
                     break;
-                case 6: // Save entire collection
+
+                // Save entire collection
+                // case 6:
                     // COME BACK HERE AND ADD THIS FUNCTIONALITY
 
             }
@@ -229,20 +273,16 @@ int main(void)
 
 int chooseCommand(void)
 {
-    int commandNum = 90;
+    int commandNum = -1;
     int i;
 
     displayMenu();
+    commandNum = scanf("%d", &commandNum);
 
-    i = 0;
-    while (commandNum < 0 && commandNum > 6)
+    while (commandNum < 0 && commandNum < 6)
     {
-        if (commandNum < 0 && commandNum > 6 && i != 0)
-        {
-            printf("Invalid Command Number! Please enter a number between 0 & 6");
-        }
+        printf("Invalid Command Number! Please enter a number between 0 & 6");
         commandNum = scanf("%d", &commandNum);
-        ++i;
     }
 
     return commandNum;
@@ -319,9 +359,10 @@ hotWheel **createHwArr(int *size)
 {
     hotWheel **temp;
 
-    temp = calloc(*size, sizeof(hotWheel *));
+    temp = calloc(*size, sizeof(hotWheel **));
     if (temp == NULL)
     {
+        printf("Failed to allocate memory when trying to create array for Hotwheel collection");
         return NULL;
     }
 
@@ -333,7 +374,7 @@ hotWheel **createHwArr(int *size)
         if (temp[i] == NULL)
         {
             // if calloc/malloc fails to find memory, then it calls destroyHotWheelArr to free all previous dynamically allocated memory and then return NULL
-            temp = destroyHotWheelArr(temp, *size);
+            temp = destroyHotWheelArr(temp, size);
             break;
         }
     }
@@ -346,7 +387,7 @@ hotWheel **createHwArr(int *size)
 // first line only contains an integer which represents number of cars
 // from there on out format is as follows:
 // year collectionNumber brand model collection\n
-hotWheel **createHwArrFile(FILE listFile, int *size)
+hotWheel **createHwArrFromFile(FILE *listFile, int *size)
 {
     hotWheel **temp;
     char year[5];
@@ -358,14 +399,15 @@ hotWheel **createHwArrFile(FILE listFile, int *size)
     int j;
     int k;
 
-    temp = calloc(*size, sizeof(hotWheel *));
+    temp = calloc(*size, sizeof(hotWheel **));
     if (temp == NULL)
     {
-        return NULL;
+        return temp;
     }
 
     for (i = 0; i < *size; i++)
     {
+        temp[i] = calloc(1, sizeof(hotWheel *));
         // reads entire line from FILE, finds length, and swaps newline char for
         // null terminator
         fgets(lineBuffer, BIG_BUFF, listFile);
@@ -373,7 +415,7 @@ hotWheel **createHwArrFile(FILE listFile, int *size)
         lineBuffer[length - 1] = '\0';
 
         // saves substrings into their appropriate struct members
-        sscanf(lineBuffer, %s %s %s %s, year, collectionNumberC, temp[i]->brand, temp[i]->model);
+        sscanf(lineBuffer, "%s %s %s %s", year, collectionNumberC, temp[i]->brand, temp[i]->model);
 
         // finds starting index of collection substring in lineBuffer
         charCount = (strlen(year) + 1) + (strlen(collectionNumberC) + 1) - (strlen(temp[i]->brand) + 1) + (strlen(temp[i]->model) + 1);
@@ -389,9 +431,8 @@ hotWheel **createHwArrFile(FILE listFile, int *size)
             // lineBuffer (incremented by 1 length - charCount times)
             temp[i]->collection[k++] = lineBuffer[j];
         }
-
-        return temp;
     }
+    return temp;
 }
 // THIS ALLOCATES MEMORY TO THE HW STRUCT AND INITIALIZES THE FIELDS WITH INPUT
 // FROM USER
@@ -419,27 +460,30 @@ hotWheel *createHw(void)
 hotWheel **addAHotWheel(hotWheel **carList, int *size)
 {
     hotWheel **newList = NULL;
-    int i;
     int numCars = 0;
+    int *addOne;
+    int i;
+    
     // this is size after adding a hotWheel
     int newSize;
     // if carList is NULL then the collection is empty, so creates a new
     // collection of one car and returns it
     if (carList == NULL)
     {
-        newList = createHwArr(1);
+        *addOne = 1;
+        newList = createHwArr(addOne);
         return newList;
     }
 
     // gets actual number of cars in the collection
-    numCars = getNumCars(carList, *size);
+    numCars = getNumCars(carList, size);
 
     // checks if array is big enough to add a car
-    if ((numCars + 1) < *size))
+    if ((numCars + 1) < *size)
     {
         // if it is big enough, then make sure the NULLs are at the end of the
         // array. Then add a car at numCars
-        shiftHotWheelArray(carList, *size);
+        shiftHotWheelArray(carList, size);
         carList[numCars] = createHw();
         return carList;
     } else
@@ -461,7 +505,7 @@ hotWheel **addHotWheels(hotWheel **carList, int *size)
 {
     hotWheel **newList = NULL;
     // num cars user wants to add
-    int carsToAdd;
+    int *carsToAdd;
     // num Cars currently in list
     int numCars = 0;
     // loop var
@@ -469,7 +513,7 @@ hotWheel **addHotWheels(hotWheel **carList, int *size)
 
 
     printf("How many cars would you like to add?\n");
-    scanf("%d", &carsToAdd);
+    scanf("%d", carsToAdd);
 
     if (carList == NULL)
     {
@@ -477,12 +521,12 @@ hotWheel **addHotWheels(hotWheel **carList, int *size)
         return newList;
     } else
     {
-        numCars = getNumCars(carList, *size);
-        if ((numCars + carsToAdd) < *size)
+        numCars = getNumCars(carList, size);
+        if ((numCars + *carsToAdd) < *size)
         {
             shiftHotWheelArray(carList, size);
 
-            for (i = numCars; i < carsToAdd; i++)
+            for (i = numCars; i < *carsToAdd; i++)
             {
                 carList[i] = createHw();
             }
@@ -490,18 +534,18 @@ hotWheel **addHotWheels(hotWheel **carList, int *size)
             return carList;
         } else
         {
-            newList = calloc((numCars + carsToAdd), sizeof(hotWheel *));
+            newList = calloc((numCars + *carsToAdd), sizeof(hotWheel *));
 
             for (i = 0; i < numCars; i++)
             {
                 newList[i] = carList[i];
             }
 
-            for (i = numCars; i < (numCars + carsToAdd); i++)
+            for (i = numCars; i < (numCars + *carsToAdd); i++)
             {
                 newList[i] = createHw();
             }
-            *size += carsToAdd;
+            *size += *carsToAdd;
             free(carList);
             return newList;
         }
@@ -535,7 +579,7 @@ void shiftHotWheelArray(hotWheel **carList, int *size)
     }
 }
 
-hotWheel *destroyAhotWheel(hotWheel *oneCar)
+hotWheel *destroyAHotWheel(hotWheel *oneCar)
 {
     free(oneCar);
     return NULL;
@@ -551,7 +595,7 @@ hotWheel **destroyHotWheelArr(hotWheel **car, int *size)
 
     for (int i = 0; i < *size; i++)
     {
-        car[i] = destroyAhotWheel(car[i]);
+        car[i] = destroyAHotWheel(car[i]);
     }
 
     free(car);
@@ -603,9 +647,9 @@ void findAndDestroy(hotWheel **car, int *size)
     i = 0;
     while(i <= BUFF)
     {
-        if (car->collection[i] == '\n')
+        if (collection[i] == '\n')
         {
-            car->collection[i] = '\0';
+            collection[i] = '\0';
             break;
         }
         ++i;
@@ -628,12 +672,12 @@ void findAndDestroy(hotWheel **car, int *size)
                     {
                         if (car[i]->collectionNumber == collectionNumber)
                         {
-                            printf("Found.\n")
+                            printf("Found.\n");
                             isFound++;
 
                             // If everything matches, then remove it.
-                            printf("Deleting...")
-                            car[i] = destroyAhotWheel(car[i]);
+                            printf("Deleting...");
+                            car[i] = destroyAHotWheel(car[i]);
                             if (car[i] == NULL)
                             {
                                 printf("Successfully deleted.\n");
@@ -654,6 +698,29 @@ void findAndDestroy(hotWheel **car, int *size)
         printf("Not found within collection.\n");
 }
 
+
+// **IMPORTANT**
+// FILE FORMAT FOR READING AND PRINTING
+// first line only contains an integer which represents number of cars
+// from there on out format is as follows:
+// year collectionNumber brand model collection\n
+FILE *createCollectFile(char *fileName, hotWheel **collection, int *arrSize)
+{
+    FILE *fp;
+    int i;
+
+    fp = fopen(fileName, "w");
+
+    fprintf(fp, "%d\n", *arrSize);
+
+    for (i = 0; i < *arrSize; i++)
+    {
+        fprintf(fp, "%d %d %s %s %s\n", collection[i]->year, collection[i]->collectionNumber,
+                collection[i]->brand, collection[i]->model, collection[i]->collection);
+    }
+
+    return fp;
+}
 int deleteCollectFile(char *fileName)
 {
     int deleted;
@@ -665,6 +732,7 @@ int deleteCollectFile(char *fileName)
     {
         deleted = 0;
         printf("Failed to delete \"%s\".\n", fileName);
+        printf("File: %s, did not exist or program did not have access to it.\n", fileName);
     }
     return deleted;
 }
@@ -687,7 +755,7 @@ void printHotWheelArr(hotWheel **carArr, int *size)
     // checks if Array (collection) is empty
     if (carArr == NULL || carArr[0] == NULL || *size == 0)
     {
-        printf("Your collection is Empty!")
+        printf("Your collection is Empty!");
     } else
     {
         // prints the list

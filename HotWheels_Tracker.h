@@ -14,13 +14,20 @@ typedef struct hotWheel
 
 // declarations
 void displayMenu(void);
-hotWheel **createHwArr(int size);
+int chooseCommand(void);
+hotWheel **createHwArrFromFile(FILE *listFile, int *size);
+hotWheel **createHwArr(int *size);
 hotWheel *createHw(void);
-hotWheel **destroyHotWheelArr(hotWheel **car, int size);
-hotWheel *destroyAhotWheel(hotWheel *oneCar);
+hotWheel **addAHotWheel(hotWheel **carList, int *size);
+hotWheel **destroyHotWheelArr(hotWheel **car, int *size);
+void findAndDestroy(hotWheel **car, int *size);
+hotWheel *destroyAHotWheel(hotWheel *oneCar);
+void shiftHotWheelArray(hotWheel **carList, int *size);
+FILE *createCollectFile(char *fileName, hotWheel **collection, int *arrSize);
+int deleteCollectFile(char *fileName);
 void promptUserHWInfo(hotWheel *car);
 void printHotWheel(hotWheel *car);
-void printHotWheelArr(hotWheel **carArr, int size);
+void printHotWheelArr(hotWheel **carArr, int *size);
 
 
 
